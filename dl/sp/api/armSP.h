@@ -30,6 +30,16 @@
 #define _armSP_H_
 
 #include <stdint.h>
+#ifdef USE_MSVS_ARM_INTRINCICS
+  #include <intrin.h>
+#endif
+
+#ifdef _MSC_VER
+  // Compilation in MSVS fails in case "inline" is used together with static keyword.
+  #define INLINE_KEYWORD __inline
+#else
+  #define INLINE_KEYWORD inline
+#endif
 
 #include "dl/api/omxtypes.h"
 
@@ -93,14 +103,20 @@ typedef struct ARMsFFTSpec_FC32_Tag
 /*
  * Compute log2(x), where x must be a power of 2.
  */
-static inline long fastlog2(long x) {
+static INLINE_KEYWORD long fastlog2(long x) {
   long out;
+#ifdef USE_MSVS_ARM_INTRINCICS
+  out = _arm_clz(x);
+  out -= 63;
+  out = ~out;
+#else
   asm("clz %0,%1\n\t"
       "sub %0, %0, #63\n\t"
       "neg %0, %0\n\t"
       : "=r"(out)
       : "r"(x)
       :);
+#endif
   return out;
 }
 
@@ -110,17 +126,17 @@ static inline long fastlog2(long x) {
  *  FFT spec must have non-NULL pointers; and the FFT size must be
  *  within range.
  */
-static inline int validateParametersFC32(const void* pSrc,
-					 const void* pDst,
-					 const ARMsFFTSpec_FC32* pFFTSpec) {
+static INLINE_KEYWORD int validateParametersFC32(const void* pSrc,
+           const void* pDst,
+           const ARMsFFTSpec_FC32* pFFTSpec) {
   return pSrc && pDst && pFFTSpec && !(((uintptr_t)pSrc) & 31) &&
          !(((uintptr_t)pDst) & 31) && pFFTSpec->pTwiddle && pFFTSpec->pBuf &&
          (pFFTSpec->N >= 2) && (pFFTSpec->N <= (1 << TWIDDLE_TABLE_ORDER));
 }
 
-static inline int validateParametersF32(const void* pSrc,
-					const void* pDst,
-					const ARMsFFTSpec_R_FC32* pFFTSpec) {
+static INLINE_KEYWORD int validateParametersF32(const void* pSrc,
+          const void* pDst,
+          const ARMsFFTSpec_R_FC32* pFFTSpec) {
   return pSrc && pDst && pFFTSpec && !(((uintptr_t)pSrc) & 31) &&
          !(((uintptr_t)pDst) & 31) && pFFTSpec->pTwiddle && pFFTSpec->pBuf &&
          (pFFTSpec->N >= 2) && (pFFTSpec->N <= (1 << TWIDDLE_TABLE_ORDER));

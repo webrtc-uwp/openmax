@@ -47,6 +47,7 @@
 @// (For example tables)
         .extern  armSP_FFTFwd_CToC_FC32_Radix2_ls_OutOfPlace_unsafe
         .extern  armSP_FFTFwd_CToC_FC32_Sfs_Radix2_ls_OutOfPlace_unsafe
+        .extern  armSP_FFTFwd_CToC_FC32_Radix4_ls_OutOfPlace_unsafe
 
 
 @//Input Registers

@@ -17,7 +17,7 @@
       '../',
     ],
     'conditions' : [
-      ['target_arch=="arm"', {
+      ['target_arch=="arm" or winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
         'conditions' : [
           ['clang==1', {
             # TODO(hans) Enable integrated-as (crbug.com/124610).
@@ -75,7 +75,17 @@
             'BIG_FFT_TABLE',
           ],
         }],
-        ['target_arch=="arm" or target_arch=="arm64"', {
+        ['OS_RUNTIME=="winrt"', {
+          'defines': [
+            'WINRT',
+          ],
+        }],
+        ['winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+          'defines': [
+            'USE_MSVS_ARM_INTRINCICS',
+          ],
+        }],
+        ['target_arch=="arm" or target_arch=="arm64" or winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
           'sources':[
             # Common files that are used by both arm and arm64 code.
             'api/arm/armOMX.h',
@@ -90,10 +100,10 @@
             'sp/src/arm/omxSP_FFTInit_R_F32.c',
           ],
         }],
-        ['target_arch=="arm"', {
+        ['target_arch=="arm" or winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
           'sources': [
             # Common files that are used by both the NEON and non-NEON code.
-            'api/armCOMM_s.h',
+            'api/arm/armCOMM_s.h',
             'sp/src/arm/omxSP_FFTGetBufSize_C_SC16.c',
             'sp/src/arm/omxSP_FFTGetBufSize_R_S16.c',
             'sp/src/arm/omxSP_FFTGetBufSize_R_S16S32.c',
@@ -129,7 +139,7 @@
             'sp/src/arm/arm64/omxSP_FFTInv_CCSToR_F32.c',
           ],
         }],
-        ['target_arch=="ia32" or target_arch=="x64"', {
+        ['(target_arch=="ia32" or target_arch=="x64") and winrt_platform!="win_phone" and  winrt_platform!="win10_arm"', {
           'conditions': [
             ['os_posix==1', {
               'cflags': [ '-msse2', ],
@@ -194,7 +204,7 @@
     },
   ],
   'conditions': [
-    ['target_arch=="arm"', {
+    ['target_arch=="arm" or winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
       'targets': [
         {
           # GN version: //third_party/opendmax_dl/openmax_dl_armv7
@@ -217,7 +227,24 @@
             'sp/src/arm/armv7/omxSP_FFTInv_CCSToR_F32_Sfs_s.S',
           ],
           'conditions': [
-            ['arm_neon_optional==1', {
+              ['winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+                'rules': [
+                {
+                  'rule_name': 'gas_preprocessor',
+                  'extension': 'S',
+                  'inputs': [
+                  ],
+                  'outputs': [
+                    '<(INTERMEDIATE_DIR)/<(RULE_INPUT_ROOT).obj',
+                  ],
+                 'action': [
+                 'perl build\gas-preprocessor.pl -as-type armasm -force-thumb -- armasm -oldit -I../ -c <(RULE_INPUT_PATH) -o <(INTERMEDIATE_DIR)/<(RULE_INPUT_ROOT).obj'
+                  ],
+                  'process_outputs_as_sources': 0,
+                  'message': 'Compiling <(RULE_INPUT_PATH)',
+                }],
+              }],
+              ['arm_neon_optional==1', {
               # Run-time NEON detection.
               'dependencies': [
                 '../../../build/android/ndk.gyp:cpu_features',
@@ -297,6 +324,23 @@
             'sp/src/arm/neon/omxSP_FFTInv_CCSToR_F32_Sfs_s.S',
           ],
           'conditions': [
+            ['winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+              'rules': [
+              {
+                'rule_name': 'gas_preprocessor',
+                'extension': 'S',
+                'inputs': [
+                ],
+                'outputs': [
+                  '<(INTERMEDIATE_DIR)/<(RULE_INPUT_ROOT).obj',
+                ],
+               'action': [
+               'perl build\gas-preprocessor.pl -as-type armasm -force-thumb -- armasm -oldit -I../ -c <(RULE_INPUT_PATH) -o <(INTERMEDIATE_DIR)/<(RULE_INPUT_ROOT).obj'
+                ],
+                'process_outputs_as_sources': 0,
+                'message': 'Compiling <(RULE_INPUT_PATH)',
+              }],
+            }],
             # Disable GCC LTO due to NEON issues
             # crbug.com/408997
             ['clang==0 and use_lto==1', {
