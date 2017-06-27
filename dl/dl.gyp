@@ -17,7 +17,7 @@
       '../',
     ],
     'conditions' : [
-      ['target_arch=="arm" or winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+      ['target_arch=="arm" or winuwp_platform=="win_phone" or winuwp_platform=="win10_arm"', {
         'conditions' : [
           ['clang==1', {
             # TODO(hans) Enable integrated-as (crbug.com/124610).
@@ -75,17 +75,17 @@
             'BIG_FFT_TABLE',
           ],
         }],
-        ['OS_RUNTIME=="winrt"', {
+        ['OS_RUNTIME=="winuwp"', {
           'defines': [
-            'WINRT',
+            'WINUWP',
           ],
         }],
-        ['winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+        ['winuwp_platform=="win_phone" or winuwp_platform=="win10_arm"', {
           'defines': [
             'USE_MSVS_ARM_INTRINCICS',
           ],
         }],
-        ['target_arch=="arm" or target_arch=="arm64" or winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+        ['target_arch=="arm" or target_arch=="arm64" or winuwp_platform=="win_phone" or winuwp_platform=="win10_arm"', {
           'sources':[
             # Common files that are used by both arm and arm64 code.
             'api/arm/armOMX.h',
@@ -100,7 +100,7 @@
             'sp/src/arm/omxSP_FFTInit_R_F32.c',
           ],
         }],
-        ['target_arch=="arm" or winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+        ['target_arch=="arm" or winuwp_platform=="win_phone" or winuwp_platform=="win10_arm"', {
           'sources': [
             # Common files that are used by both the NEON and non-NEON code.
             'api/arm/armCOMM_s.h',
@@ -139,7 +139,7 @@
             'sp/src/arm/arm64/omxSP_FFTInv_CCSToR_F32.c',
           ],
         }],
-        ['(target_arch=="ia32" or target_arch=="x64") and winrt_platform!="win_phone" and  winrt_platform!="win10_arm"', {
+        ['(target_arch=="ia32" or target_arch=="x64") and winuwp_platform!="win_phone" and  winuwp_platform!="win10_arm"', {
           'conditions': [
             ['os_posix==1', {
               'cflags': [ '-msse2', ],
@@ -204,7 +204,7 @@
     },
   ],
   'conditions': [
-    ['target_arch=="arm" or winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+    ['target_arch=="arm" or winuwp_platform=="win_phone" or winuwp_platform=="win10_arm"', {
       'targets': [
         {
           # GN version: //third_party/opendmax_dl/openmax_dl_armv7
@@ -227,7 +227,7 @@
             'sp/src/arm/armv7/omxSP_FFTInv_CCSToR_F32_Sfs_s.S',
           ],
           'conditions': [
-              ['winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+              ['winuwp_platform=="win_phone" or winuwp_platform=="win10_arm"', {
                 'rules': [
                 {
                   'rule_name': 'gas_preprocessor',
@@ -324,7 +324,7 @@
             'sp/src/arm/neon/omxSP_FFTInv_CCSToR_F32_Sfs_s.S',
           ],
           'conditions': [
-            ['winrt_platform=="win_phone" or winrt_platform=="win10_arm"', {
+            ['winuwp_platform=="win_phone" or winuwp_platform=="win10_arm"', {
               'rules': [
               {
                 'rule_name': 'gas_preprocessor',
