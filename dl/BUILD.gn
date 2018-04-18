@@ -11,7 +11,7 @@ declare_args() {
 }
 
 config("dl_config") {
-  include_dirs = [ ".." ]
+  include_dirs = [ "..", "./", ]
   if (current_cpu == "arm") {
     if (arm_use_neon) {
       # Enable build-time NEON selection.
@@ -34,6 +34,10 @@ config("dl_config") {
       # Else /usr/bin/as gets picked up.
       asmflags += [ "-B${rebased_android_toolchain_root}/bin" ]
     }
+  }
+  
+  if ( (current_cpu == "arm" || current_cpu == "arm64") && current_os == "win" && target_os == "winuwp") {
+    defines += [ "USE_MSVS_ARM_INTRINCICS" ]
   }
 }
 
