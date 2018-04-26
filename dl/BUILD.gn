@@ -5,6 +5,7 @@
 import("//build/config/android/config.gni")
 import("//build/config/arm.gni")
 
+
 declare_args() {
   # Override this value to build with small float FFT tables
   openmax_big_float_fft = true
@@ -178,7 +179,7 @@ static_library("dl") {
 
 if (current_cpu == "arm") {
 
-      openmax_dl_neon_asm_sources = [
+    openmax_dl_neon_asm_sources = [
       # Complex 32-bit fixed-point FFT.
       "sp/src/arm/neon/armSP_FFT_CToC_SC32_Radix2_fs_unsafe_s.S",
       "sp/src/arm/neon/armSP_FFT_CToC_SC32_Radix2_ls_unsafe_s.S",
@@ -230,43 +231,30 @@ if (current_cpu == "arm") {
       "sp/src/arm/neon/omxSP_FFTFwd_RToCCS_F32_Sfs_s.S",
       "sp/src/arm/neon/omxSP_FFTInv_CCSToR_F32_Sfs_s.S",
     ]
-  # GYP: third_party/openmax_dl/dl/dl.gyp:openmax_dl_armv7
-  # Non-NEON implementation of FFT. This library is NOT
-  # standalone. Applications must link with openmax_dl.
-  static_library("openmax_dl_armv7") {
-    configs += [ ":dl_config" ]
-    visibility = [ ":*" ]
-
-    sources = [
+    
+    openmax_dl_armv7_asm_sources = [
       # Complex floating-point FFT
-      "$target_gen_dir/armv7/armSP_FFT_CToC_FC32_Radix2_fs_unsafe_s.S.obj",
-      "$target_gen_dir/armv7/armSP_FFT_CToC_FC32_Radix4_fs_unsafe_s.S.obj",
-      "$target_gen_dir/armv7/armSP_FFT_CToC_FC32_Radix4_unsafe_s.S.obj",
-      "$target_gen_dir/armv7/armSP_FFT_CToC_FC32_Radix8_fs_unsafe_s.S.obj",
-      "$target_gen_dir/armv7/omxSP_FFTInv_CToC_FC32_Sfs_s.S.obj",
-      "$target_gen_dir/armv7/omxSP_FFTFwd_CToC_FC32_Sfs_s.S.obj",
+      "sp/src/arm/armv7/armSP_FFT_CToC_FC32_Radix2_fs_unsafe_s.S",
+      "sp/src/arm/armv7/armSP_FFT_CToC_FC32_Radix4_fs_unsafe_s.S",
+      "sp/src/arm/armv7/armSP_FFT_CToC_FC32_Radix4_unsafe_s.S",
+      "sp/src/arm/armv7/armSP_FFT_CToC_FC32_Radix8_fs_unsafe_s.S",
+      "sp/src/arm/armv7/omxSP_FFTInv_CToC_FC32_Sfs_s.S",
+      "sp/src/arm/armv7/omxSP_FFTFwd_CToC_FC32_Sfs_s.S",
 
       # Real floating-point FFT
-      "$target_gen_dir/armv7/armSP_FFTInv_CCSToR_F32_preTwiddleRadix2_unsafe_s.S.obj",
-      "$target_gen_dir/armv7/omxSP_FFTFwd_RToCCS_F32_Sfs_s.S.obj",
-      "$target_gen_dir/armv7/omxSP_FFTInv_CCSToR_F32_Sfs_s.S.obj",
+      "sp/src/arm/armv7/armSP_FFTInv_CCSToR_F32_preTwiddleRadix2_unsafe_s.S",
+      "sp/src/arm/armv7/omxSP_FFTFwd_RToCCS_F32_Sfs_s.S",
+      "sp/src/arm/armv7/omxSP_FFTInv_CCSToR_F32_Sfs_s.S",
     ]
-    if (arm_optionally_use_neon) {
-      # Run-time NEON detection.
-      deps = [ "//third_party/android_tools:cpu_features" ]
-      # To get the __android_log_print routine
-      libs = [ "log" ]
-      # Detection routine
-      sources += [ "sp/src/arm/detect.c" ]
-    }
-  }
 
   if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "win" && target_os == "winuwp") {
-    action_foreach("compile_arm_assembly") {
+
+    
+    action_foreach("compile_openmax_dl_armv7_arm_assembly") {
       script = "//third_party/openmax_dl/dl/run_perl.py"
-      sources = openmax_dl_neon_asm_sources
+      sources = openmax_dl_armv7_asm_sources
       outputs = [
-        "$target_gen_dir/{{source_file_part}}.obj",
+        "$target_gen_dir/armv7/{{source_file_part}}.obj",
       ]
  
       args = [
@@ -275,10 +263,59 @@ if (current_cpu == "arm") {
         "-i",
         "{{source}}",
         "-o",
-        rebase_path("$target_gen_dir/{{source_file_part}}.obj"),
+        rebase_path("$target_gen_dir/armv7/{{source_file_part}}.obj"),
         "-p",
         "environment.store_arm",
+        "-l",
+        "../../third_party/openmax_dl/",
       ]
+    }
+    
+    action_foreach("compile_openmax_dl_neon_arm_assembly") {
+      script = "//third_party/openmax_dl/dl/run_perl.py"
+      sources = openmax_dl_neon_asm_sources
+      outputs = [
+        "$target_gen_dir/neon/{{source_file_part}}.obj",
+      ]
+ 
+      args = [
+        "-s",
+        "../../third_party/openmax_dl/dl/build/gas-preprocessor.pl",
+        "-i",
+        "{{source}}",
+        "-o",
+        rebase_path("$target_gen_dir/neon/{{source_file_part}}.obj"),
+        "-p",
+        "environment.store_arm",
+        "-l",
+        "../../third_party/openmax_dl/",
+      ]
+    }
+  }
+  
+  # GYP: third_party/openmax_dl/dl/dl.gyp:openmax_dl_armv7
+  # Non-NEON implementation of FFT. This library is NOT
+  # standalone. Applications must link with openmax_dl.
+  static_library("openmax_dl_armv7") {
+    configs += [ ":dl_config" ]
+    visibility = [ ":*" ]
+
+    if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "win" && target_os == "winuwp") {
+      sources = get_target_outputs(":compile_openmax_dl_armv7_arm_assembly")
+      deps = [
+        ":compile_openmax_dl_armv7_arm_assembly",
+      ]
+    } else {
+      sources = openmax_dl_armv7_asm_sources
+    }
+    
+    if (arm_optionally_use_neon) {
+      # Run-time NEON detection.
+      deps = [ "//third_party/android_tools:cpu_features" ]
+      # To get the __android_log_print routine
+      libs = [ "log" ]
+      # Detection routine
+      sources += [ "sp/src/arm/detect.c" ]
     }
   }
   
@@ -295,14 +332,12 @@ if (current_cpu == "arm") {
     }
       
     if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "win" && target_os == "winuwp") {
-      sources = get_target_outputs(":compile_arm_assembly")
+      sources = get_target_outputs(":compile_openmax_dl_neon_arm_assembly")
+      deps = [
+        ":compile_openmax_dl_neon_arm_assembly",
+      ]
     } else {
       sources = openmax_dl_neon_asm_sources
     }
-    
-    
-    deps = [
-      ":compile_arm_assembly",
-    ]
   }
 }
