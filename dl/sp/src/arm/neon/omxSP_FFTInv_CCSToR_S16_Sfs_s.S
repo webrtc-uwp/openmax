@@ -45,6 +45,8 @@
 .extern  armSP_FFTInv_CToC_SC16_Radix2_ls_OutOfPlace_unsafe
 .extern  armSP_FFTInv_CToC_SC16_Radix2_ps_OutOfPlace_unsafe
 .extern  armSP_FFTInv_CToC_SC16_Sfs_Radix2_ps_OutOfPlace_unsafe
+.extern  armSP_FFTInv_CCSToR_S16_preTwiddleRadix2_unsafe
+.extern  armSP_FFTInv_CCSToR_S16_Sfs_preTwiddleRadix2_unsafe
 
 @Input Registers
 #define pSrc            r0
