@@ -251,7 +251,7 @@ if (current_cpu == "arm") {
 
     
     action_foreach("compile_openmax_dl_armv7_arm_assembly") {
-      script = "//third_party/openmax_dl/dl/run_perl.py"
+      script = "//webrtc/build/Win_ARM_Tools/run_arm_asm_compiler.py"
       sources = openmax_dl_armv7_asm_sources
       outputs = [
         "$target_gen_dir/armv7/{{source_file_part}}.obj",
@@ -272,7 +272,7 @@ if (current_cpu == "arm") {
     }
     
     action_foreach("compile_openmax_dl_neon_arm_assembly") {
-      script = "//third_party/openmax_dl/dl/run_perl.py"
+      script = "//webrtc/build/Win_ARM_Tools/run_arm_asm_compiler.py"
       sources = openmax_dl_neon_asm_sources
       outputs = [
         "$target_gen_dir/neon/{{source_file_part}}.obj",
