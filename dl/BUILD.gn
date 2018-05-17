@@ -37,7 +37,7 @@ config("dl_config") {
     }
   }
   
-  if ( (current_cpu == "arm" || current_cpu == "arm64") && current_os == "win" && target_os == "winuwp") {
+  if ( (current_cpu == "arm" || current_cpu == "arm64") && current_os == "winuwp" && target_os == "winuwp") {
     defines += [ "USE_MSVS_ARM_INTRINCICS" ]
   }
 }
@@ -247,7 +247,7 @@ if (current_cpu == "arm") {
       "sp/src/arm/armv7/omxSP_FFTInv_CCSToR_F32_Sfs_s.S",
     ]
 
-  if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "win" && target_os == "winuwp") {
+  if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "winuwp" && target_os == "winuwp") {
 
     
     action_foreach("compile_openmax_dl_armv7_arm_assembly") {
@@ -300,7 +300,7 @@ if (current_cpu == "arm") {
     configs += [ ":dl_config" ]
     visibility = [ ":*" ]
 
-    if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "win" && target_os == "winuwp") {
+    if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "winuwp" && target_os == "winuwp") {
       sources = get_target_outputs(":compile_openmax_dl_armv7_arm_assembly")
       deps = [
         ":compile_openmax_dl_armv7_arm_assembly",
@@ -331,7 +331,7 @@ if (current_cpu == "arm") {
       asmflags = [ "-mfpu=neon" ]
     }
       
-    if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "win" && target_os == "winuwp") {
+    if ((current_cpu == "arm" || current_cpu == "arm64") && current_os == "winuwp" && target_os == "winuwp") {
       sources = get_target_outputs(":compile_openmax_dl_neon_arm_assembly")
       deps = [
         ":compile_openmax_dl_neon_arm_assembly",
